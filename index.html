@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>Cat Rhythm House</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div id="game-shell">
+        <canvas id="game-canvas"></canvas>
+        <div id="ui-layer">
+          <div id="gameplay-hud">
+            <div class="score-badge" aria-label="Score badge">
+              <div class="score-icon-wrap">
+                <img id="score-icon" alt="Score rank A" />
+              </div>
+              <div class="score-copy">
+                <div class="score-label">Score</div>
+                <div id="score-value">000000</div>
+              </div>
+            </div>
+            <div id="feedback-text" class="feedback-text hidden" aria-live="polite"></div>
+          </div>
+
+          <div id="screen-overlays">
+            <section id="intro-screen" class="screen screen-intro">
+              <div class="intro-copy">
+                <div>ARE YOU</div>
+                <div>READY?</div>
+              </div>
+              <button id="intro-button" class="intro-hit-button" type="button" aria-label="Start">
+                <img id="intro-ring" class="intro-hit-ring-image" alt="Tap ring" />
+              </button>
+            </section>
+
+            <section id="tutorial-screen" class="screen screen-tutorial" aria-label="Tutorial">
+              <div class="tutorial-backdrop"></div>
+              <div class="tutorial-copy" aria-hidden="true">
+                <div>TAP</div>
+                <div>TAP</div>
+                <div>TAP</div>
+              </div>
+              <img id="tutorial-hand" alt="Tap hand" />
+              <img id="tutorial-ring" alt="Hit zone ring" />
+              <button id="tutorial-overlay" class="tutorial-tap-target" type="button" aria-label="Continue to gameplay">
+                <span class="sr-only">Tap to continue</span>
+              </button>
+            </section>
+
+            <section id="result-screen" class="screen screen-result" aria-label="Result">
+              <div class="result-backdrop"></div>
+              <div class="result-card">
+                <button id="result-close" class="result-close" type="button" aria-label="Close result">+</button>
+                <div class="result-title">CORE</div>
+                <img id="result-rank-icon" class="result-rank-icon" alt="Rank A" />
+                <div id="result-score" class="result-score">000000</div>
+                <div class="result-actions">
+                  <button id="result-exit" class="result-exit" type="button">EXIT</button>
+                </div>
+                <button id="result-replay" class="result-replay" type="button" aria-label="Replay">
+                  <span class="result-replay-arrow">&#8635;</span>
+                </button>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
