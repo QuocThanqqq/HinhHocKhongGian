@@ -1,24 +1,24 @@
-# Cat Rhythm House
+# Hinh Hoc Khong Gian
 
-Small vertical 2D rhythm game prototype built with Three.js and Vite.
+Website hoc hinh hoc khong gian 3D chay tren trinh duyet, dung Three.js de quan sat va mo hinh cac khoi co ban.
 
-## Run locally
+## Chay local
 
 ```bash
 npm install
 npm run dev
 ```
 
-Then open the local Vite URL in your browser.
-
-## Controls
-
-- `Space` or `Enter`
-- Mouse click
-- Touch tap
+Mo dia chi Vite hien ra trong trinh duyet.
 
 ## Build
 
 ```bash
 npm run build
 ```
+
+## File chinh
+
+- `index.html`: bo cuc giao dien
+- `style.css`: giao dien va responsive
+- `script.js`: logic Three.js, xoay camera, mo hinh, fullscreen

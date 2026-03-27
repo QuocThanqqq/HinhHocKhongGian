@@ -3,6 +3,8 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
 const FACE_COLORS = ["#7fc0ff", "#ffc66d", "#66ffd9", "#fff07d", "#ff9bc6", "#b8a6ff"];
 const UNFOLD_DAMPING = 3.7;
+const IDLE_AUTOROTATE_DELAY = 3200;
+const IDLE_AUTOROTATE_SPEED = 0.45;
 
 const ui = {
   shapeSelect: document.getElementById("shape-select"),
@@ -52,6 +54,8 @@ controls.minDistance = 4;
 controls.maxDistance = 18;
 controls.rotateSpeed = 0.9;
 controls.zoomSpeed = 0.9;
+controls.autoRotate = false;
+controls.autoRotateSpeed = IDLE_AUTOROTATE_SPEED;
 controls.minPolarAngle = 0.05;
 controls.maxPolarAngle = Math.PI - 0.05;
 controls.target.set(0, 0, 0);
@@ -91,6 +95,13 @@ let autoCamera = 0;
 let selectedFaceId = null;
 let labelsVisible = false;
 let faceOpacity = 1;
+let lastInteractionAt = performance.now();
+let isUserOrbiting = false;
+
+function registerInteraction() {
+  lastInteractionAt = performance.now();
+  controls.autoRotate = false;
+}
 
 function showRuntimeMessage(message, isError = false) {
   if (ui.hoverReadout) {
@@ -1202,56 +1213,70 @@ function animate() {
   updateMaterials();
   updateModeText();
   resetCamera(false, delta);
+  const shouldAutoRotate =
+    !isUserOrbiting &&
+    autoCamera <= 0.001 &&
+    performance.now() - lastInteractionAt > IDLE_AUTOROTATE_DELAY;
+  controls.autoRotate = shouldAutoRotate;
   controls.update();
   renderer.render(scene, camera);
 }
 
 ui.openButton.addEventListener("click", () => {
+  registerInteraction();
   unfoldTarget = 1;
   autoCamera = 1;
   syncActionButtons();
 });
 
 ui.toolbarOpenButton.addEventListener("click", () => {
+  registerInteraction();
   unfoldTarget = 1;
   autoCamera = 1;
   syncActionButtons();
 });
 
 ui.fullscreenOpenButton?.addEventListener("click", () => {
+  registerInteraction();
   unfoldTarget = 1;
   autoCamera = 1;
   syncActionButtons();
 });
 
 ui.fullscreenShapeButton?.addEventListener("click", () => {
+  registerInteraction();
   cycleShape();
 });
 
 ui.closeButton.addEventListener("click", () => {
+  registerInteraction();
   unfoldTarget = 0;
   autoCamera = 1;
   syncActionButtons();
 });
 
 ui.toolbarCloseButton.addEventListener("click", () => {
+  registerInteraction();
   unfoldTarget = 0;
   autoCamera = 1;
   syncActionButtons();
 });
 
 ui.fullscreenCloseButton?.addEventListener("click", () => {
+  registerInteraction();
   unfoldTarget = 0;
   autoCamera = 1;
   syncActionButtons();
 });
 
 ui.resetButton.addEventListener("click", () => {
+  registerInteraction();
   resetCamera(true);
   autoCamera = 1;
 });
 
 ui.toggleLabelsButton.addEventListener("click", () => {
+  registerInteraction();
   labelsVisible = !labelsVisible;
   syncLabelToggleText();
   syncActionButtons();
@@ -1259,6 +1284,7 @@ ui.toggleLabelsButton.addEventListener("click", () => {
 
 ui.fullscreenButton?.addEventListener("click", async () => {
   try {
+    registerInteraction();
     if (document.fullscreenElement === ui.canvasWrap) {
       await document.exitFullscreen();
     } else {
@@ -1271,6 +1297,7 @@ ui.fullscreenButton?.addEventListener("click", async () => {
 
 ui.fullscreenExitButton?.addEventListener("click", async () => {
   try {
+    registerInteraction();
     if (document.fullscreenElement === ui.canvasWrap) {
       await document.exitFullscreen();
     }
@@ -1286,12 +1313,16 @@ document.addEventListener("fullscreenchange", () => {
 });
 
 ui.shapeSelect.addEventListener("change", (event) => {
+  registerInteraction();
   setShape(event.target.value);
 });
 
 ui.canvas.addEventListener("pointermove", setPointer);
+ui.canvas.addEventListener("pointerdown", registerInteraction);
+ui.canvas.addEventListener("wheel", registerInteraction, { passive: true });
 ui.canvas.addEventListener("touchstart", setPointer, { passive: true });
 ui.canvas.addEventListener("touchmove", setPointer, { passive: true });
+ui.canvas.addEventListener("touchstart", registerInteraction, { passive: true });
 ui.canvas.addEventListener("pointerleave", () => {
   hoveredFace = null;
   pointer.set(2, 2);
@@ -1303,6 +1334,7 @@ ui.canvas.addEventListener("pointerleave", () => {
 });
 
 ui.canvas.addEventListener("click", () => {
+  registerInteraction();
   if (!hoveredFace) {
     return;
   }
@@ -1311,6 +1343,16 @@ ui.canvas.addEventListener("click", () => {
   unfoldTarget = unfoldTarget > 0.5 ? 0 : 1;
   autoCamera = 1;
   syncActionButtons();
+});
+
+controls.addEventListener("start", () => {
+  isUserOrbiting = true;
+  registerInteraction();
+});
+
+controls.addEventListener("end", () => {
+  isUserOrbiting = false;
+  registerInteraction();
 });
 
 window.addEventListener("resize", onResize);
