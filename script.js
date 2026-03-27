@@ -1194,7 +1194,8 @@ function setPointer(event) {
 }
 
 function onResize() {
-  const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+  const isCompactLayout = window.innerWidth <= 900 || window.innerHeight <= 720;
+  const scale = isCompactLayout ? 1 : Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
   document.documentElement.style.setProperty("--app-scale", `${scale}`);
   const width = ui.canvasWrap.clientWidth;
   const height = ui.canvasWrap.clientHeight;

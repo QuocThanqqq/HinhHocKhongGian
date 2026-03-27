@@ -446,3 +446,93 @@ button:focus-visible {
   height: 100%;
   display: block;
 }
+
+@media (max-width: 900px), (max-height: 720px) {
+  html,
+  body {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  body {
+    width: 100%;
+    min-height: 100dvh;
+  }
+
+  .page-shell {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    height: auto;
+    min-height: 100dvh;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 12px;
+    transform: none;
+  }
+
+  .control-panel,
+  .canvas-card {
+    border-radius: 28px;
+  }
+
+  .control-panel {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .panel-copy h1 {
+    font-size: 2.45rem;
+  }
+
+  .canvas-card {
+    padding: 14px;
+    min-height: 68dvh;
+  }
+
+  .canvas-toolbar {
+    align-items: start;
+    gap: 10px;
+  }
+
+  .toolbar-title {
+    font-size: 1.6rem;
+  }
+
+  .stage-actions {
+    gap: 10px;
+    padding: 0;
+  }
+
+  .stage-action {
+    padding: 10px 14px;
+    font-size: 0.95rem;
+  }
+
+  .stage-action-compact {
+    padding: 8px 12px;
+    font-size: 0.86rem;
+  }
+
+  .canvas-wrap {
+    min-height: 54dvh;
+    border-radius: 24px;
+  }
+
+  .fullscreen-tools {
+    top: 12px;
+    right: 12px;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: end;
+    max-width: calc(100% - 24px);
+  }
+
+  .fullscreen-tool {
+    padding: 8px 12px;
+    font-size: 0.86rem;
+  }
+}
