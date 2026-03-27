@@ -531,6 +531,54 @@ button:focus-visible {
   display: flex;
 }
 
+body.pseudo-fullscreen {
+  overflow: hidden;
+}
+
+body.pseudo-fullscreen .math-background,
+body.pseudo-fullscreen .control-panel,
+body.pseudo-fullscreen .canvas-toolbar,
+body.pseudo-fullscreen .stage-actions {
+  display: none;
+}
+
+body.pseudo-fullscreen .page-shell {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  grid-template-columns: 1fr;
+  padding: 0;
+  gap: 0;
+  transform: none;
+}
+
+body.pseudo-fullscreen .stage-panel,
+body.pseudo-fullscreen .canvas-card {
+  min-height: 100dvh;
+  height: 100dvh;
+}
+
+body.pseudo-fullscreen .canvas-card {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+body.pseudo-fullscreen .canvas-wrap {
+  min-height: 100dvh;
+  height: 100dvh;
+  border: 0;
+  border-radius: 0;
+}
+
+body.pseudo-fullscreen .fullscreen-tools {
+  display: flex;
+}
+
 .fullscreen-tool {
   border: 1px solid rgba(150, 181, 245, 0.34);
   border-radius: 999px;

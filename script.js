@@ -98,6 +98,7 @@ let faceOpacity = 1;
 let lastInteractionAt = performance.now();
 let isUserOrbiting = false;
 let touchTapCandidate = null;
+let isPseudoFullscreen = false;
 
 function registerInteraction() {
   lastInteractionAt = performance.now();
@@ -947,7 +948,10 @@ function syncActionButtons() {
   ui.closeButton.classList.toggle("is-active", !isOpen);
   ui.fullscreenOpenButton?.classList.toggle("is-active", isOpen);
   ui.fullscreenCloseButton?.classList.toggle("is-active", !isOpen);
-  ui.fullscreenButton?.classList.toggle("is-active", document.fullscreenElement === ui.canvasWrap);
+  ui.fullscreenButton?.classList.toggle(
+    "is-active",
+    document.fullscreenElement === ui.canvasWrap || isPseudoFullscreen
+  );
 }
 
 syncLabelToggleText = function syncLabelToggleTextOverride() {
@@ -959,9 +963,46 @@ function syncFullscreenButton() {
     return;
   }
 
-  const isFullscreen = document.fullscreenElement === ui.canvasWrap;
+  const isFullscreen = document.fullscreenElement === ui.canvasWrap || isPseudoFullscreen;
   ui.fullscreenButton.textContent = isFullscreen ? "Thu nhỏ" : "Toàn màn hình";
   ui.fullscreenButton.classList.toggle("is-active", isFullscreen);
+}
+
+function enterPseudoFullscreen() {
+  isPseudoFullscreen = true;
+  document.body.classList.add("pseudo-fullscreen");
+  syncFullscreenButton();
+  syncActionButtons();
+  onResize();
+}
+
+function exitPseudoFullscreen() {
+  isPseudoFullscreen = false;
+  document.body.classList.remove("pseudo-fullscreen");
+  syncFullscreenButton();
+  syncActionButtons();
+  onResize();
+}
+
+async function toggleFullscreenMode() {
+  const isCompactLayout = window.innerWidth <= 900 || window.innerHeight <= 720;
+
+  if (isPseudoFullscreen) {
+    exitPseudoFullscreen();
+    return;
+  }
+
+  if (document.fullscreenElement === ui.canvasWrap) {
+    await document.exitFullscreen();
+    return;
+  }
+
+  if (isCompactLayout || !ui.canvasWrap.requestFullscreen) {
+    enterPseudoFullscreen();
+    return;
+  }
+
+  await ui.canvasWrap.requestFullscreen();
 }
 
 function cycleShape() {
@@ -1317,11 +1358,7 @@ ui.toggleLabelsButton.addEventListener("click", () => {
 ui.fullscreenButton?.addEventListener("click", async () => {
   try {
     registerInteraction();
-    if (document.fullscreenElement === ui.canvasWrap) {
-      await document.exitFullscreen();
-    } else {
-      await ui.canvasWrap.requestFullscreen();
-    }
+    await toggleFullscreenMode();
   } catch (error) {
     showRuntimeMessage(`Không thể mở toàn màn hình: ${error.message}`, true);
   }
@@ -1330,7 +1367,9 @@ ui.fullscreenButton?.addEventListener("click", async () => {
 ui.fullscreenExitButton?.addEventListener("click", async () => {
   try {
     registerInteraction();
-    if (document.fullscreenElement === ui.canvasWrap) {
+    if (isPseudoFullscreen) {
+      exitPseudoFullscreen();
+    } else if (document.fullscreenElement === ui.canvasWrap) {
       await document.exitFullscreen();
     }
   } catch (error) {
