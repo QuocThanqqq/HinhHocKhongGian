@@ -97,6 +97,7 @@ let labelsVisible = false;
 let faceOpacity = 1;
 let lastInteractionAt = performance.now();
 let isUserOrbiting = false;
+let touchTapCandidate = null;
 
 function registerInteraction() {
   lastInteractionAt = performance.now();
@@ -1102,6 +1103,36 @@ function updateHover() {
   }
 }
 
+function getHitFaceId() {
+  if (!currentShape) {
+    return null;
+  }
+
+  raycaster.setFromCamera(pointer, camera);
+  const targets = currentShape.instances.flatMap(
+    (instance) => instance.object.userData.hitMeshes ?? [instance.object.userData.mesh]
+  );
+  const hits = raycaster.intersectObjects(targets);
+  if (hits.length === 0) {
+    return null;
+  }
+
+  return currentShape.instances.find((instance) =>
+    (instance.object.userData.hitMeshes ?? [instance.object.userData.mesh]).includes(hits[0].object)
+  )?.face.id ?? null;
+}
+
+function activateFace(faceId) {
+  if (!faceId) {
+    return;
+  }
+
+  rebuildShapeFromFace(faceId);
+  unfoldTarget = unfoldTarget > 0.5 ? 0 : 1;
+  autoCamera = 1;
+  syncActionButtons();
+}
+
 function updateMaterials() {
   currentShape.instances.forEach(({ face, object }) => {
     const mesh = object.userData.mesh;
@@ -1319,7 +1350,26 @@ ui.shapeSelect.addEventListener("change", (event) => {
 });
 
 ui.canvas.addEventListener("pointermove", setPointer);
-ui.canvas.addEventListener("pointerdown", registerInteraction);
+ui.canvas.addEventListener("pointerdown", (event) => {
+  registerInteraction();
+  touchTapCandidate = { x: event.clientX, y: event.clientY, pointerType: event.pointerType };
+});
+ui.canvas.addEventListener("pointerup", (event) => {
+  if (event.pointerType !== "touch" || !touchTapCandidate) {
+    return;
+  }
+
+  const moved =
+    Math.abs(event.clientX - touchTapCandidate.x) > 14 ||
+    Math.abs(event.clientY - touchTapCandidate.y) > 14;
+  touchTapCandidate = null;
+  if (moved) {
+    return;
+  }
+
+  setPointer(event);
+  activateFace(getHitFaceId());
+});
 ui.canvas.addEventListener("wheel", registerInteraction, { passive: true });
 ui.canvas.addEventListener("touchstart", setPointer, { passive: true });
 ui.canvas.addEventListener("touchmove", setPointer, { passive: true });
@@ -1336,14 +1386,7 @@ ui.canvas.addEventListener("pointerleave", () => {
 
 ui.canvas.addEventListener("click", () => {
   registerInteraction();
-  if (!hoveredFace) {
-    return;
-  }
-
-  rebuildShapeFromFace(hoveredFace);
-  unfoldTarget = unfoldTarget > 0.5 ? 0 : 1;
-  autoCamera = 1;
-  syncActionButtons();
+  activateFace(getHitFaceId() ?? hoveredFace);
 });
 
 controls.addEventListener("start", () => {
