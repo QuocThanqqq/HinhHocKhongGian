@@ -1,76 +1,128 @@
 <!doctype html>
-<html lang="en">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
-    <title>Cat Rhythm House</title>
-    <link rel="stylesheet" href="/style.css" />
+    <title>Hình Học Không Gian Vui Nhộn</title>
+    <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <div id="app">
-      <div id="game-shell">
-        <canvas id="game-canvas"></canvas>
-        <div id="ui-layer">
-          <div id="gameplay-hud">
-            <div class="score-badge" aria-label="Score badge">
-              <div class="score-icon-wrap">
-                <img id="score-icon" alt="Score rank A" />
-              </div>
-              <div class="score-copy">
-                <div class="score-label">Score</div>
-                <div id="score-value">000000</div>
-              </div>
+    <div class="page-shell">
+      <aside class="control-panel">
+        <div class="panel-copy playful-card panel-hero">
+          <p class="eyebrow">Học hình học bằng mắt nhìn</p>
+          <div class="hero-badges">
+            <span class="hero-badge">3D trực quan</span>
+            <span class="hero-badge warm">Khám phá vui</span>
+          </div>
+          <h1>Hình học không gian</h1>
+          <p class="intro">
+            Chọn khối, xoay quanh mô hình và xem cách khối mở ra thành lưới phẳng.
+          </p>
+        </div>
+
+        <label class="field playful-card">
+          <span>Chọn khối hình</span>
+          <select id="shape-select" aria-label="Chọn khối hình">
+            <option value="sphere">Hình cầu</option>
+            <option value="cylinder">Hình trụ</option>
+            <option value="cube">Hình lập phương</option>
+            <option value="rectangularPrism">Hình hộp chữ nhật</option>
+          </select>
+        </label>
+
+        <div class="button-grid playful-card action-stack">
+          <button id="open-button" class="action-button primary" type="button">
+            Mở hình
+          </button>
+          <button id="close-button" class="action-button secondary" type="button">
+            Đóng hình
+          </button>
+          <button id="reset-button" class="action-button ghost" type="button">
+            Reset góc nhìn
+          </button>
+        </div>
+
+        <section class="info-card playful-card">
+          <div class="info-header">
+            <h2 id="shape-name">Hình cầu</h2>
+            <span id="mode-badge" class="mode-badge">Khối 3D</span>
+          </div>
+          <p id="shape-description" class="shape-description"></p>
+          <div class="stats-grid">
+            <div class="stat-item blue">
+              <span class="stat-label">Số mặt</span>
+              <strong id="faces-count">1</strong>
             </div>
-            <div id="feedback-text" class="feedback-text hidden" aria-live="polite"></div>
+            <div class="stat-item peach">
+              <span class="stat-label">Số cạnh</span>
+              <strong id="edges-count">0</strong>
+            </div>
+            <div class="stat-item mint">
+              <span class="stat-label">Số đỉnh</span>
+              <strong id="vertices-count">0</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="hint-card playful-card">
+          <h2>Gợi ý sử dụng</h2>
+          <ul>
+            <li>Kéo chuột để xoay camera quanh mô hình.</li>
+            <li>Lăn chuột để phóng to hoặc thu nhỏ.</li>
+            <li>Bấm vào hình để mở hoặc đóng mô hình.</li>
+          </ul>
+        </section>
+      </aside>
+
+      <main class="stage-panel">
+        <div class="canvas-card">
+          <div class="canvas-toolbar">
+            <div class="toolbar-copy">
+              <p class="toolbar-label">Khu vực quan sát</p>
+              <p id="toolbar-title" class="toolbar-title">Khối 3D có thể xoay</p>
+            </div>
+            <button id="fullscreen-button" class="stage-action stage-action-compact" type="button">
+              Toàn màn hình
+            </button>
           </div>
 
-          <div id="screen-overlays">
-            <section id="intro-screen" class="screen screen-intro">
-              <div class="intro-copy">
-                <div>ARE YOU</div>
-                <div>READY?</div>
-              </div>
-              <button id="intro-button" class="intro-hit-button" type="button" aria-label="Start">
-                <img id="intro-ring" class="intro-hit-ring-image" alt="Tap ring" />
-              </button>
-            </section>
+          <div class="stage-actions" aria-label="Thanh tác vụ mô hình">
+            <button id="toolbar-open-button" class="stage-action is-primary" type="button">
+              Mở hình
+            </button>
+            <button id="toolbar-close-button" class="stage-action" type="button">
+              Đóng hình
+            </button>
+            <button id="toggle-labels-button" class="stage-action" type="button">
+              Ẩn tên mặt
+            </button>
+          </div>
 
-            <section id="tutorial-screen" class="screen screen-tutorial" aria-label="Tutorial">
-              <div class="tutorial-backdrop"></div>
-              <div class="tutorial-copy" aria-hidden="true">
-                <div>TAP</div>
-                <div>TAP</div>
-                <div>TAP</div>
-              </div>
-              <img id="tutorial-hand" alt="Tap hand" />
-              <img id="tutorial-ring" alt="Hit zone ring" />
-              <button id="tutorial-overlay" class="tutorial-tap-target" type="button" aria-label="Continue to gameplay">
-                <span class="sr-only">Tap to continue</span>
+          <div id="canvas-wrap" class="canvas-wrap">
+            <canvas id="scene-canvas"></canvas>
+            <div class="fullscreen-tools" aria-label="Thanh tác vụ toàn màn hình">
+              <button id="fullscreen-shape-button" class="fullscreen-tool" type="button">
+                Đổi hình
               </button>
-            </section>
-
-            <section id="result-screen" class="screen screen-result" aria-label="Result">
-              <div class="result-backdrop"></div>
-              <div class="result-card">
-                <button id="result-close" class="result-close" type="button" aria-label="Close result">+</button>
-                <div class="result-title">CORE</div>
-                <img id="result-rank-icon" class="result-rank-icon" alt="Rank A" />
-                <div id="result-score" class="result-score">000000</div>
-                <div class="result-actions">
-                  <button id="result-exit" class="result-exit" type="button">EXIT</button>
-                </div>
-                <button id="result-replay" class="result-replay" type="button" aria-label="Replay">
-                  <span class="result-replay-arrow">&#8635;</span>
-                </button>
-              </div>
-            </section>
+              <button id="fullscreen-open-button" class="fullscreen-tool" type="button">
+                Mở hình
+              </button>
+              <button id="fullscreen-close-button" class="fullscreen-tool" type="button">
+                Đóng hình
+              </button>
+              <button id="fullscreen-exit-button" class="fullscreen-tool fullscreen-tool-exit" type="button">
+                Thoát toàn màn hình
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
-    <script type="module" src="/main.js"></script>
+
+    <script type="module" src="./script.js"></script>
   </body>
 </html>
